@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador de elevadores</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#e4e6e8; --ink:#1d2125; --muted:#5b636a; --steel:#c9cdd1; --steel-2:#aeb4ba;
+  --graphite:#23272b; --graphite-2:#31363b; --amber:#ffb000; --amber-dim:#5a4210; --line:#b9bec3;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#15181b;--ink:#e8eaec;--muted:#98a0a7;--steel:#3a4046;--steel-2:#4b535a;--graphite:#0e1012;--graphite-2:#20252a;--line:#2d3338}
+}
+:root[data-theme="dark"]{--bg:#15181b;--ink:#e8eaec;--muted:#98a0a7;--steel:#3a4046;--steel-2:#4b535a;--graphite:#0e1012;--graphite-2:#20252a;--line:#2d3338}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:24px 18px 40px}
+h1{font:700 34px/1.1 "Barlow Condensed",Impact,sans-serif;margin:0 0 6px;letter-spacing:.01em}
+p.lead{margin:0 0 24px;color:var(--muted);max-width:60ch}
+.stage{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:760px){.stage{grid-template-columns:1fr}}
+
+.building{display:grid;grid-template-columns:96px 1fr 1fr;background:var(--graphite);border-radius:6px;padding:14px 14px 14px 0;color:#e8eaec}
+.rows{display:flex;flex-direction:column}
+.row{height:56px;display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-right:12px;border-top:1px solid var(--graphite-2)}
+.row:first-child{border-top:0}
+.row b{font:700 20px "Barlow Condensed",sans-serif;width:30px;text-align:right;color:#aab1b8}
+.hall{display:flex;flex-direction:column;gap:3px}
+.shaft{position:relative;height:392px;margin-left:6px;background:linear-gradient(90deg,#0a0c0d,#16191c 50%,#0a0c0d);border-left:2px solid #3b4248;border-right:2px solid #3b4248}
+.shaft .tag{position:absolute;top:-1px;left:0;right:0;text-align:center;font:700 13px "Barlow Condensed",sans-serif;color:#6e777f;padding-top:2px}
+.cab{position:absolute;left:8px;right:8px;height:52px;bottom:2px;background:#8a9198;border:2px solid #c3c8cc;border-radius:2px;overflow:hidden;display:flex;transition:none}
+.cab i{display:block;flex:1;background:linear-gradient(90deg,#b7bdc2,#d9dde0 45%,#a9afb5);border-right:1px solid #6d747a;transition:none;will-change:transform}
+.cab i:last-child{border-right:0;border-left:1px solid #6d747a}
+
+.cabins{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.panel{background:var(--steel);border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:12px}
+.panel h2{margin:0;font:700 16px "Barlow Condensed",sans-serif;color:var(--muted)}
+.display{background:#0b0c0d;border-radius:3px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;color:var(--amber);font:700 44px/1 "Barlow Condensed",sans-serif;min-height:60px;text-shadow:0 0 10px rgba(255,176,0,.45)}
+.display .arrow{font-size:28px;width:30px;text-align:right}
+.keys{display:grid;grid-template-columns:1fr 1fr;gap:10px;justify-items:center}
+.door{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+button.k{appearance:none;cursor:pointer;width:46px;height:46px;border-radius:50%;border:3px solid var(--steel-2);background:radial-gradient(circle at 35% 30%,#f2f4f5,#b9bfc4 70%);color:#23272b;font:700 18px "Barlow Condensed",sans-serif;box-shadow:0 2px 0 rgba(0,0,0,.35),inset 0 -2px 3px rgba(0,0,0,.18);transition:transform .08s,box-shadow .08s,border-color .15s,background .15s}
+button.k:active{transform:translateY(2px);box-shadow:0 0 0 rgba(0,0,0,.35),inset 0 2px 4px rgba(0,0,0,.25)}
+button.k.lit{border-color:var(--amber);box-shadow:0 0 12px 2px rgba(255,176,0,.65),inset 0 -2px 3px rgba(0,0,0,.18);background:radial-gradient(circle at 35% 30%,#fff4d6,#ffd36b 70%)}
+button.k.sm{width:30px;height:30px;font-size:13px;border-width:2px}
+button.k:focus-visible,button.w:focus-visible{outline:3px solid #3b82f6;outline-offset:2px}
+button.w{appearance:none;cursor:pointer;border:1px solid var(--steel-2);background:var(--graphite-2);color:#e8eaec;border-radius:4px;padding:8px 0;font:700 17px "Barlow Condensed",sans-serif;letter-spacing:.02em}
+button.w:active{background:var(--graphite)}
+.note{margin-top:16px;font-size:14px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){button.k{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Simulador de elevadores</h1>
+  <p class="lead">Chama o elevador nos botões de cada piso (à esquerda) ou carrega num piso dentro de uma cabine. O sistema envia o elevador mais próximo.</p>
+  <div class="stage">
+    <div class="building" id="building" aria-label="Edifício com dois elevadores"></div>
+    <div class="cabins" id="cabins"></div>
+  </div>
+  <p class="note">Dica: carrega em vários pisos seguidos e vê como o elevador organiza as paragens.</p>
+</main>
+<script>
+(function(){
+  var N=7, H=56, SPEED=1.7;
+  var label=function(f){return f===0?"R/C":String(f)};
+  var building=document.getElementById("building");
+  var cabinsEl=document.getElementById("cabins");
+
+  var els=["A","B"].map(function(n,i){
+    return {n:n,pos:i===0?0:4,stops:new Set(),dir:0,mode:"idle",d:0,t:0,target:null};
+  });
+  var calls=[]; // {f,dir,el}
+
+  // Coluna de pisos + botões de chamada
+  var rows=document.createElement("div"); rows.className="rows";
+  var hallBtns={};
+  for(var f=N-1;f>=0;f--){
+    var r=document.createElement("div"); r.className="row";
+    var b=document.createElement("b"); b.textContent=label(f); r.appendChild(b);
+    var h=document.createElement("div"); h.className="hall";
+    [1,-1].forEach(function(dir){
+      var ff=f;
+      if((dir===1&&ff===N-1)||(dir===-1&&ff===0)){var sp=document.createElement("span");sp.style.cssText="width:30px;height:30px";h.appendChild(sp);return;}
+      var k=document.createElement("button"); k.className="k sm"; k.textContent=dir===1?"▲":"▼";
+      k.setAttribute("aria-label","Chamar elevador no piso "+label(ff)+(dir===1?", para subir":", para descer"));
+      k.onclick=function(){hallCall(ff,dir)};
+      hallBtns[ff+"_"+dir]=k; h.appendChild(k);
+    });
+    r.appendChild(h); rows.appendChild(r);
+  }
+  building.appendChild(rows);
+
+  // Poços e cabines
+  els.forEach(function(e){
+    var s=document.createElement("div"); s.className="shaft";
+    s.innerHTML='<div class="tag">'+e.n+'</div>';
+    var c=document.createElement("div"); c.className="cab";
+    c.innerHTML="<i></i><i></i>";
+    s.appendChild(c); building.appendChild(s);
+    e.cab=c; e.doors=c.querySelectorAll("i");
+
+    var p=document.createElement("section"); p.className="panel";
+    p.innerHTML='<h2>Cabine '+e.n+'</h2><div class="display"><span class="num">R/C</span><span class="arrow"></span></div><div class="keys"></div><div class="door"><button class="w" data-a="open" aria-label="Abrir portas">◀ ▶</button><button class="w" data-a="close" aria-label="Fechar portas">▶ ◀</button></div>';
+    var keys=p.querySelector(".keys"); e.keys={};
+    for(var f=N-1;f>=0;f--){
+      (function(ff){
+        var k=document.createElement("button"); k.className="k"; k.textContent=label(ff);
+        k.setAttribute("aria-label","Cabine "+e.n+", piso "+label(ff));
+        k.onclick=function(){press(e,ff)};
+        e.keys[ff]=k; keys.appendChild(k);
+      })(f);
+    }
+    p.querySelector('[data-a="open"]').onclick=function(){openDoor(e)};
+    p.querySelector('[data-a="close"]').onclick=function(){if(e.mode==="hold")e.t=0};
+    e.num=p.querySelector(".num"); e.arrow=p.querySelector(".arrow");
+    cabinsEl.appendChild(p);
+  });
+
+  function press(e,f){
+    if(f===Math.round(e.pos)&&(e.mode==="idle"||e.mode==="closing"||e.mode==="hold")){openDoor(e);return;}
+    e.stops.add(f); e.keys[f].classList.add("lit");
+  }
+  function openDoor(e){
+    if(e.mode==="hold")e.t=2.2;
+    else if(e.mode==="idle"||e.mode==="closing"){e.pos=Math.round(e.pos);e.mode="opening";}
+  }
+  function hallCall(f,dir){
+    var key=f+"_"+dir;
+    if(hallBtns[key].classList.contains("lit"))return;
+    var best=null,cost=1e9;
+    els.forEach(function(e){
+      var c=Math.abs(e.pos-f)+e.stops.size*1.5+(e.mode==="idle"?0:1);
+      if(c<cost){cost=c;best=e;}
+    });
+    if(f===Math.round(best.pos)&&(best.mode==="idle"||best.mode==="closing"||best.mode==="hold")){openDoor(best);return;}
+    hallBtns[key].classList.add("lit");
+    calls.push({f:f,dir:dir,el:best});
+    best.stops.add(f);
+  }
+  function arrive(e,f){
+    e.stops.delete(f); e.keys[f].classList.remove("lit");
+    calls=calls.filter(function(c){
+      if(c.el===e&&c.f===f){hallBtns[c.f+"_"+c.dir].classList.remove("lit");return false;}
+      return true;
+    });
+    e.mode="opening";
+  }
+  function choose(e){
+    if(!e.stops.size){e.dir=0;return;}
+    var arr=Array.from(e.stops),up=[],down=[];
+    arr.forEach(function(f){(f>=e.pos?up:down).push(f)});
+    up.sort(function(a,b){return a-b});down.sort(function(a,b){return b-a});
+    var goUp=e.dir>=0?up.length>0:down.length===0;
+    if(goUp){e.target=up[0];e.dir=1;}else{e.target=down[0];e.dir=-1;}
+    if(e.target===e.pos)e.dir=0;
+    e.mode="move";
+  }
+
+  function step(e,dt){
+    if(e.mode==="idle"){
+      var f=Math.round(e.pos);
+      if(e.stops.has(f)){e.pos=f;arrive(e,f);}else choose(e);
+    }
+    if(e.mode==="move"){
+      var diff=e.target-e.pos, mv=SPEED*dt;
+      if(Math.abs(diff)<=mv){e.pos=e.target;arrive(e,e.target);}
+      else e.pos+=Math.sign(diff)*mv;
+    }else if(e.mode==="opening"){
+      e.d+=dt*1.8; if(e.d>=1){e.d=1;e.mode="hold";e.t=2.2;}
+    }else if(e.mode==="hold"){
+      e.t-=dt; if(e.t<=0)e.mode="closing";
+    }else if(e.mode==="closing"){
+      e.d-=dt*1.8; if(e.d<=0){e.d=0;e.mode="idle";if(!e.stops.size)e.dir=0;}
+    }
+  }
+  function draw(e){
+    e.cab.style.bottom=(e.pos*H+2)+"px";
+    var w=e.d*100;
+    e.doors[0].style.transform="translateX(-"+w+"%)";
+    e.doors[1].style.transform="translateX("+w+"%)";
+    e.num.textContent=label(Math.round(e.pos));
+    e.arrow.textContent=e.mode==="move"?(e.dir>0?"▲":"▼"):"";
+  }
+
+  var last=performance.now();
+  function loop(now){
+    var dt=Math.min((now-last)/1000,.1); last=now;
+    els.forEach(function(e){step(e,dt);draw(e);});
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
