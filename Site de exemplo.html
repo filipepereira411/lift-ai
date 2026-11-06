@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Meu Site</title>
+<style>
+  :root{
+    --bg:#ffffff; --text:#1a1a1a; --muted:#6b6b6b; --accent:#2563eb; --card:#f5f6f8; --border:#e2e4e8;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1115; --text:#f1f2f4; --muted:#9aa0aa; --accent:#60a5fa; --card:#181b21; --border:#2a2e37;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  nav{
+    position:sticky; top:0; z-index:10; display:flex; gap:1rem; padding:1rem 1.5rem;
+    background:var(--bg); border-bottom:1px solid var(--border); flex-wrap:wrap;
+    padding-top:calc(1rem + env(safe-area-inset-top,0px));
+  }
+  nav a{color:var(--text); text-decoration:none; font-weight:600; font-size:.95rem;}
+  nav a:hover{color:var(--accent);}
+  section{max-width:760px; margin:0 auto; padding:3rem 1.5rem;}
+  h1{font-size:1.9rem; margin-bottom:.3rem;}
+  h2{font-size:1.4rem; margin-top:0;}
+  p.lead{color:var(--muted); margin-top:0;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1.5rem;}
+  label{display:block; font-size:.85rem; font-weight:600; margin:.9rem 0 .3rem;}
+  input, textarea{
+    width:100%; padding:.7rem .8rem; border-radius:8px; border:1px solid var(--border);
+    background:var(--bg); color:var(--text); font-size:1rem; font-family:inherit;
+  }
+  textarea{min-height:100px; resize:vertical;}
+  button{
+    margin-top:1.3rem; background:var(--accent); color:#fff; border:none; padding:.8rem 1.4rem;
+    border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer;
+  }
+  button:hover{opacity:.9;}
+  .hero{text-align:center; padding:4rem 1.5rem 2rem;}
+  .hero h1{font-size:2.3rem;}
+  .alert{
+    background:#fef3c7; color:#78350f; padding:1rem; border-radius:8px; margin-bottom:1.5rem; font-size:.9rem;
+  }
+  @media (prefers-color-scheme: dark){ .alert{background:#3a2e10; color:#fcd34d;} }
+  .signs{display:grid; gap:1rem; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));}
+  .signs .card{margin-bottom:0;}
+  footer{text-align:center; color:var(--muted); font-size:.85rem; padding:2rem 1.5rem 3rem;}
+  .consent{font-size:.8rem; color:var(--muted); margin-top:.6rem;}
+  code{background:var(--card); padding:.1rem .4rem; border-radius:4px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#landing">Início</a>
+  <a href="#contato">Contato</a>
+  <a href="#phishing">Segurança / Phishing</a>
+</nav>
+
+<!-- LANDING PAGE DE CAPTURA DE LEADS -->
+<section id="landing" class="hero">
+  <h1>Nome do Produto/Serviço</h1>
+  <p class="lead">Uma frase curta explicando o valor do que você oferece. Troque este texto pelo seu.</p>
+  <div class="card" style="max-width:420px; margin:2rem auto; text-align:left;">
+    <h2 style="margin-top:0;">Receba novidades</h2>
+    <p class="lead" style="margin-bottom:0;">Deixe seu e-mail para receber atualizações. Você pode cancelar quando quiser.</p>
+    <form id="leadForm">
+      <label for="leadEmail">E-mail</label>
+      <input type="email" id="leadEmail" name="email" placeholder="voce@exemplo.com" required>
+      <button type="submit">Quero receber</button>
+      <p class="consent">Ao enviar, você concorda em receber e-mails nossos. Não compartilhamos seus dados com terceiros.</p>
+    </form>
+  </div>
+</section>
+
+<!-- FORMULÁRIO DE CONTATO -->
+<section id="contato">
+  <h2>Fale conosco</h2>
+  <p class="lead">Preencha o formulário abaixo e retornaremos em breve.</p>
+  <div class="card">
+    <form id="contactForm">
+      <label for="nome">Nome</label>
+      <input type="text" id="nome" name="nome" placeholder="Seu nome" required>
+
+      <label for="email">E-mail</label>
+      <input type="email" id="email" name="email" placeholder="voce@exemplo.com" required>
+
+      <label for="telefone">Telefone (opcional)</label>
+      <input type="tel" id="telefone" name="telefone" placeholder="(11) 90000-0000">
+
+      <label for="mensagem">Mensagem</label>
+      <textarea id="mensagem" name="mensagem" placeholder="Como podemos ajudar?" required></textarea>
+
+      <button type="submit">Enviar mensagem</button>
+      <p class="consent">Seus dados são usados apenas para responder ao seu contato.</p>
+    </form>
+  </div>
+</section>
+
+<!-- PÁGINA EDUCATIVA SOBRE PHISHING -->
+<section id="phishing">
+  <h2>Como reconhecer phishing</h2>
+  <p class="lead">Phishing é quando alguém se passa por uma empresa ou pessoa confiável para roubar seus dados ou dinheiro. Aqui estão os principais sinais de alerta.</p>
+
+  <div class="alert">
+    ⚠️ Nunca informe senhas, códigos de verificação ou dados de cartão em links recebidos por e-mail, SMS ou WhatsApp sem confirmar a origem.
+  </div>
+
+  <div class="signs">
+    <div class="card">
+      <strong>Urgência artificial</strong>
+      <p class="lead" style="margin-bottom:0;">Mensagens que dizem "sua conta será bloqueada em 24h" para te apressar a clicar sem pensar.</p>
+    </div>
+    <div class="card">
+      <strong>Links suspeitos</strong>
+      <p class="lead" style="margin-bottom:0;">Passe o mouse sobre o link antes de clicar: o endereço real pode ser diferente do que aparece.</p>
+    </div>
+    <div class="card">
+      <strong>Pedidos incomuns</strong>
+      <p class="lead" style="margin-bottom:0;">Empresas sérias não pedem senha completa, código do cartão ou código de SMS por e-mail/chat.</p>
+    </div>
+    <div class="card">
+      <strong>Remetente estranho</strong>
+      <p class="lead" style="margin-bottom:0;">Confira o domínio do e-mail: <code>empresa.com</code> é diferente de <code>empresa-suporte.net</code>.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1.5rem;">
+    <strong>O que fazer se suspeitar:</strong>
+    <ol style="margin:.5rem 0 0; padding-left:1.2rem;">
+      <li>Não clique em nenhum link da mensagem.</li>
+      <li>Acesse o site oficial digitando o endereço diretamente no navegador.</li>
+      <li>Confirme com a empresa por um canal oficial conhecido.</li>
+      <li>Denuncie e apague a mensagem.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  © 2026 — Site de exemplo. Substitua pelos seus dados.
+</footer>
+
+<script>
+  // Demonstração: apenas mostra confirmação visual. Não envia dados a nenhum servidor.
+  function handleDemoSubmit(formId, successMsg){
+    const form = document.getElementById(formId);
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      form.innerHTML = '<p style="color:#16a34a; font-weight:600;">' + successMsg + '</p>';
+    });
+  }
+  handleDemoSubmit('leadForm', '✓ Obrigado! Verifique seu e-mail em breve.');
+  handleDemoSubmit('contactForm', '✓ Mensagem enviada! Retornaremos em breve.');
+</script>
+
+</body>
+</html>
